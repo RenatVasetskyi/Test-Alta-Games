@@ -29,6 +29,18 @@ MonoBehaviour:
     m_Address: BaseCamera
     m_ReadOnly: 0
     m_SerializedLabels: []
+  - m_GUID: 9811adcca1f73124189fc17e78d197b5
+    m_Address: Obstacle
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 2d0f602b98721b6498300906d5699620
+    m_Address: Ball
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 4ecf80715a0afd94684390fcaf49e6db
+    m_Address: Level
+    m_ReadOnly: 0
+    m_SerializedLabels: []
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: 42bc2f5c9e5f09c46bdb822c84de0c05, type: 2}
   m_SchemaSet:

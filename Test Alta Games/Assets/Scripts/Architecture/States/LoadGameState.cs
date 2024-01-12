@@ -2,6 +2,7 @@ using Architecture.Services.Interfaces;
 using Architecture.States.Interfaces;
 using Audio;
 using Data;
+using Game;
 using UnityEngine;
 
 namespace Architecture.States
@@ -44,8 +45,12 @@ namespace Architecture.States
             Transform parent = (await _baseFactory.CreateAddressableWithObject
                 (_gameSettings.BaseParent, Vector3.zero, Quaternion.identity, null)).transform;
             
+            Level level = (await _baseFactory.CreateAddressableWithContainer
+                (_gameSettings.Level, Vector3.zero, Quaternion.identity, parent)).GetComponent<Level>();
+            
             Camera camera = (await _baseFactory.CreateAddressableWithContainer
-                (_gameSettings.BaseCamera, Vector3.zero, Quaternion.identity, parent)).GetComponent<Camera>();
+                (_gameSettings.BaseCamera, level.CameraSpawnPosition.position,
+                    level.CameraSpawnPosition.rotation, parent)).GetComponent<Camera>();
             
             _audioService.PlayMusic(MusicType.Game);
         }

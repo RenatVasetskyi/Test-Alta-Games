@@ -11,5 +11,6 @@ namespace Data
         public AssetReferenceGameObject BaseParent;
         public AssetReferenceGameObject BaseCamera;
         public AssetReferenceGameObject MainMenu;
+        public AssetReferenceGameObject Level;
     }
 }
