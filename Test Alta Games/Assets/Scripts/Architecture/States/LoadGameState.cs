@@ -48,6 +48,9 @@ namespace Architecture.States
             Level level = (await _baseFactory.CreateAddressableWithContainer
                 (_gameSettings.Level, Vector3.zero, Quaternion.identity, parent)).GetComponent<Level>();
             
+            GameObject ball = (await _baseFactory.CreateAddressableWithContainer
+                (_gameSettings.Ball, level.BallSpawnPosition.position, Quaternion.identity, parent));
+            
             Camera camera = (await _baseFactory.CreateAddressableWithContainer
                 (_gameSettings.BaseCamera, level.CameraSpawnPosition.position,
                     level.CameraSpawnPosition.rotation, parent)).GetComponent<Camera>();

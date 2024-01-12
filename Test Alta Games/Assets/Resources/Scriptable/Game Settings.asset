@@ -32,3 +32,8 @@ MonoBehaviour:
     m_SubObjectName: 
     m_SubObjectType: 
     m_EditorAssetChanged: 0
+  Ball:
+    m_AssetGUID: 2d0f602b98721b6498300906d5699620
+    m_SubObjectName: 
+    m_SubObjectType: 
+    m_EditorAssetChanged: 0
