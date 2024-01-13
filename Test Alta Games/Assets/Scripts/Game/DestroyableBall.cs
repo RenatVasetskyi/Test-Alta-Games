@@ -1,13 +1,10 @@
-﻿using System.Collections;
-using Game.Interfaces;
+﻿using Game.Data;
 using UnityEngine;
 
 namespace Game
 {
     public class DestroyableBall : MonoBehaviour
     {
-        private const int MaxScalePercent = 100;
-        
         private const float MovementDuration = 2.5f;
 
         [SerializeField] private Rigidbody _rigidbody;
@@ -17,16 +14,9 @@ namespace Game
         
         [SerializeField] private LayerMask _obstacleLayer;
 
-        private PathLine _pathLine;
-        
         private LTDescr _movementTween;
         private LTDescr _rotationTween;
 
-        public void Initialize(PathLine pathLine)
-        {
-            _pathLine = pathLine;
-        }
-        
         public void AddScale(Vector3 scale)
         {
             transform.localScale += scale;
@@ -39,13 +29,13 @@ namespace Game
         
         private void OnCollisionEnter(Collision other)
         {
-            if (other.gameObject.TryGetComponent(out IDestroyableObstacle obstacle))
+            if (other.gameObject.layer == Layers.ObstacleLayerNumber)
             {
                 if (_movementTween != null)
                 {
                     StopMovement();
                     
-                    DetectObstaclesToDestroy();
+                    DetectObstaclesAndDestroy();
                 }
             }
         }
@@ -58,28 +48,15 @@ namespace Game
             _rigidbody.isKinematic = true;
         }
 
-        private void DetectObstaclesToDestroy()
+        private void DetectObstaclesAndDestroy()
         {
-            float detectRadius = (_collider.radius * 2 ) * transform.localScale.y;
+            float detectRadius = (_collider.radius * 2) * transform.localScale.y;
             
             RaycastHit[] obstacles = Physics.SphereCastAll(transform.position, detectRadius,
                 transform.right * detectRadius, detectRadius, _obstacleLayer);
 
             foreach (RaycastHit obstacle in obstacles)
-            {
-                IDestroyableObstacle destroyableObstacle = obstacle.collider.GetComponent<IDestroyableObstacle>();
-                
-                destroyableObstacle.Destroy();
-            }
-            
-            StartCoroutine(AAAA());
-        }
-
-        private IEnumerator AAAA()
-        {
-            yield return new WaitForSeconds(1);
-            
-            _pathLine.CheckIsHasObstaclesOnPath();
+                Destroy(obstacle.collider.gameObject);
             
             Destroy(gameObject);
         }

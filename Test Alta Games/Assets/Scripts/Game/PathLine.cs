@@ -6,6 +6,9 @@ namespace Game
     public class PathLine : MonoBehaviour
     {
         private const int MaxScalePercent = 100;
+
+        [SerializeField] private LayerMask _obstacleLayer;
+        [SerializeField] private BoxCollider _collider;
         
         private float _startScale;
         
@@ -17,6 +20,15 @@ namespace Game
 
             if (currentPercent > percentStep)
                 transform.localScale -= new Vector3(0, 0, scaleToReduce);
+        }
+        
+        public void CheckIsHasObstaclesOnPath()
+        {
+            RaycastHit[] obstacles = Physics.BoxCastAll(transform.position, transform.lossyScale, 
+                Vector3.zero, transform.rotation, 0, _obstacleLayer);
+            
+            if (obstacles.Length == 0)
+                Debug.Log("Win");
         }
 
         private void Awake()

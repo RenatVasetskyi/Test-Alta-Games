@@ -65,8 +65,6 @@ namespace Game
                     _collider.radius * 2, Quaternion.identity, transform.parent))
                 .GetComponent<DestroyableBall>();
             
-            newBall.Initialize(_pathLine);
-
             newBall.transform.localScale = Vector3.zero;
             
             StartCoroutine(ScaleBall(newBall));
