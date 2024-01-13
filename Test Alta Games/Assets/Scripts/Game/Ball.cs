@@ -64,6 +64,8 @@ namespace Game
                 (_gameSettings.DestroyableBall, transform.position + transform.right *
                     _collider.radius * 2, Quaternion.identity, transform.parent))
                 .GetComponent<DestroyableBall>();
+            
+            newBall.Initialize(_pathLine);
 
             newBall.transform.localScale = Vector3.zero;
             
@@ -74,7 +76,7 @@ namespace Game
         {
             while (_isScreenTouched)
             {
-                float ballCurrentScalePercent = ReduceScale(ScalePercentStep);
+                float ballCurrentScalePercent = ReduceScale(newBall, ScalePercentStep);
 
                 if (ballCurrentScalePercent < CriticalScalePercent)
                 {
@@ -84,7 +86,6 @@ namespace Game
                 }
                 else
                 {
-                    newBall.AddScale(ScalePercentStep);
                     _pathLine.ReduceScale(ScalePercentStep);
                 }
                 
@@ -94,14 +95,20 @@ namespace Game
             newBall.Move(_targetPoint.position);
         }
 
-        private float ReduceScale(float percentStep)
+        private float ReduceScale(DestroyableBall newBall, float percentStep)
         {
             float currentPercent = transform.localScale.y * MaxScalePercent / _startScale;
             
             float scaleToReduce = (_startScale / MaxScalePercent) * percentStep;
 
             if (currentPercent > percentStep)
-                transform.localScale -= new Vector3(scaleToReduce, scaleToReduce, scaleToReduce);
+            {
+                Vector3 scale = new Vector3(scaleToReduce, scaleToReduce, scaleToReduce);
+                
+                transform.localScale -= scale;
+                
+                newBall.AddScale(scale);
+            }
 
             return currentPercent;
         }

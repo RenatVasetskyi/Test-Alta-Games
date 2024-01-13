@@ -1,4 +1,5 @@
-﻿using Game.Interfaces;
+﻿using System.Collections;
+using Game.Interfaces;
 using UnityEngine;
 
 namespace Game
@@ -15,20 +16,20 @@ namespace Game
         [Space]
         
         [SerializeField] private LayerMask _obstacleLayer;
-        
-        private float _startScale;
 
+        private PathLine _pathLine;
+        
         private LTDescr _movementTween;
         private LTDescr _rotationTween;
-        
-        public void AddScale(float percentStep)
-        {
-            float currentPercent = transform.localScale.y * MaxScalePercent / _startScale;
-            
-            float scaleToAdd = (_startScale / MaxScalePercent) * percentStep;
 
-            if (currentPercent + percentStep < MaxScalePercent)
-                transform.localScale += new Vector3(scaleToAdd, scaleToAdd, scaleToAdd);
+        public void Initialize(PathLine pathLine)
+        {
+            _pathLine = pathLine;
+        }
+        
+        public void AddScale(Vector3 scale)
+        {
+            transform.localScale += scale;
         }
 
         public void Move(Vector3 to)
@@ -36,11 +37,6 @@ namespace Game
             _movementTween = LeanTween.move(gameObject, to, MovementDuration);
         }
         
-        private void Awake()
-        {
-            _startScale = transform.localScale.y;
-        }
-
         private void OnCollisionEnter(Collision other)
         {
             if (other.gameObject.TryGetComponent(out IDestroyableObstacle obstacle))
@@ -64,13 +60,28 @@ namespace Game
 
         private void DetectObstaclesToDestroy()
         {
-            float radius = _collider.radius * transform.localScale.y;
+            float detectRadius = (_collider.radius * 2 ) * transform.localScale.y;
             
-            RaycastHit[] obstacles = Physics.SphereCastAll(transform.position, radius,
-                transform.forward, radius, _obstacleLayer);
+            RaycastHit[] obstacles = Physics.SphereCastAll(transform.position, detectRadius,
+                transform.right * detectRadius, detectRadius, _obstacleLayer);
 
             foreach (RaycastHit obstacle in obstacles)
-                obstacle.transform.position = new Vector3(obstacle.transform.position.x, 5, obstacle.transform.position.z);
+            {
+                IDestroyableObstacle destroyableObstacle = obstacle.collider.GetComponent<IDestroyableObstacle>();
+                
+                destroyableObstacle.Destroy();
+            }
+            
+            StartCoroutine(AAAA());
+        }
+
+        private IEnumerator AAAA()
+        {
+            yield return new WaitForSeconds(1);
+            
+            _pathLine.CheckIsHasObstaclesOnPath();
+            
+            Destroy(gameObject);
         }
     }
 }

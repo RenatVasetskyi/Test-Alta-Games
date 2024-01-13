@@ -29,10 +29,6 @@ MonoBehaviour:
     m_Address: BaseCamera
     m_ReadOnly: 0
     m_SerializedLabels: []
-  - m_GUID: 9811adcca1f73124189fc17e78d197b5
-    m_Address: Obstacle
-    m_ReadOnly: 0
-    m_SerializedLabels: []
   - m_GUID: 2d0f602b98721b6498300906d5699620
     m_Address: Ball
     m_ReadOnly: 0
