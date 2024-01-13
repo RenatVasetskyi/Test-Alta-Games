@@ -6,6 +6,7 @@ namespace Game
     {
         public Transform CameraSpawnPosition;
         public Transform BallSpawnPosition;
+        public Transform TargetPoint;
         public PathLine PathLine;
     }
 }

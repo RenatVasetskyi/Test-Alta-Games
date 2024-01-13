@@ -28,6 +28,8 @@ namespace Game
         private bool _isScreenTouched;
 
         private float _startScale;
+
+        private Transform _targetPoint;
         
         [Inject]
         public void Construct(GameSettings gameSettings, IBaseFactory baseFactory)
@@ -36,10 +38,12 @@ namespace Game
             _baseFactory = baseFactory;
         }
         
-        public void Initialize(IScreenTouchReporter screenTouchReporter, PathLine pathLine)
+        public void Initialize(IScreenTouchReporter screenTouchReporter, PathLine pathLine, 
+            Transform targetPoint)
         {
             _screenTouchReporter = screenTouchReporter;
             _pathLine = pathLine;
+            _targetPoint = targetPoint;
 
             Subscribe();
         }
@@ -86,6 +90,8 @@ namespace Game
                 
                 yield return new WaitForSeconds(TimeStep);
             }
+            
+            newBall.Move(_targetPoint.position);
         }
 
         private float ReduceScale(float percentStep)
@@ -100,19 +106,12 @@ namespace Game
             return currentPercent;
         }
 
-        private void MoveNewBall()
-        {
-            
-        }
-
         private void ScreenTouchHandler(bool isTouched)
         {
             _isScreenTouched = isTouched;
             
             if (isTouched)
                 CreateNewBall();
-            else
-                MoveNewBall();
         }
         
         private void Subscribe()
