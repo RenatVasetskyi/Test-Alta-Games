@@ -65,7 +65,7 @@ namespace Architecture.States
                 (_gameSettings.GameView, Vector3.zero, Quaternion.identity, parent)).GetComponent<GameView>();
             gameView.GetComponent<Canvas>().worldCamera = camera;
             
-            ball.Initialize(gameView.ScreenTouchReporter);
+            ball.Initialize(gameView.ScreenTouchReporter, level.PathLine);
             
             _audioService.PlayMusic(MusicType.Game);
 
