@@ -37,3 +37,13 @@ MonoBehaviour:
     m_SubObjectName: 
     m_SubObjectType: 
     m_EditorAssetChanged: 0
+  GameView:
+    m_AssetGUID: 95d2215cc1d99d141a11994267d9cf0d
+    m_SubObjectName: 
+    m_SubObjectType: 
+    m_EditorAssetChanged: 0
+  DestroyableBall:
+    m_AssetGUID: 033f206649a637c4bb92c3e81af9ddbb
+    m_SubObjectName: 
+    m_SubObjectType: 
+    m_EditorAssetChanged: 0

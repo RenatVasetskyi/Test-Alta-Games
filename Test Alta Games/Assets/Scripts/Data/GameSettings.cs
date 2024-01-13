@@ -1,3 +1,4 @@
+using Game;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 
@@ -13,5 +14,7 @@ namespace Data
         public AssetReferenceGameObject MainMenu;
         public AssetReferenceGameObject Level;
         public AssetReferenceGameObject Ball;
+        public AssetReferenceGameObject GameView;
+        public AssetReferenceGameObject DestroyableBall;
     }
 }
