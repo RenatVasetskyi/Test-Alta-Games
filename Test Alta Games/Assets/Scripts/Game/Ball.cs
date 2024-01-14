@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using DG.Tweening;
+using Game.Interfaces;
 using UI.Game.Interfaces;
 using UnityEngine;
 
@@ -25,18 +26,24 @@ namespace Game
         [SerializeField] private Ease _jumpEasing; 
         
         private IScreenTouchReporter _screenTouchReporter;
-        private Level _level;
-        
-        private DestroyableBall _destroyableBallPrefab;
+        private IGameOverReporter _gameOverReporter;
+        private IGameObjectScaler _gameObjectScaler;
+        private IDestroyableBallCreator _destroyableBallCreator;
+        private Transform _targetPoint;
         
         private bool _isScreenTouched;
 
         private float _startScale;
         
-        public void Initialize(IScreenTouchReporter screenTouchReporter, Level level)
+        public void Initialize(IScreenTouchReporter screenTouchReporter, IGameOverReporter gameOverReporter, 
+            IGameObjectScaler gameObjectScaler, IDestroyableBallCreator destroyableBallCreator, 
+            Transform targetPoint)
         {
             _screenTouchReporter = screenTouchReporter;
-            _level = level;
+            _gameOverReporter = gameOverReporter;
+            _gameObjectScaler = gameObjectScaler;
+            _destroyableBallCreator = destroyableBallCreator;
+            _targetPoint = targetPoint;
 
             Subscribe();
         }
@@ -53,7 +60,8 @@ namespace Game
 
         private async void CreateNewBall()
         { 
-            DestroyableBall destroyableBall = await _level.CreateDestroyableBall(transform, _collider.radius * 2);
+            DestroyableBall destroyableBall = await _destroyableBallCreator
+                .CreateDestroyableBall(transform, _collider.radius * 2);
             
             StartCoroutine(ScaleBall(destroyableBall));
         }
@@ -66,7 +74,7 @@ namespace Game
 
                 if (ballCurrentScalePercent < CriticalScalePercent)
                 {
-                    _level.SendLose();
+                    _gameOverReporter.SendLose();
                     
                     Destroy(gameObject);
                 }
@@ -74,7 +82,7 @@ namespace Game
                 yield return new WaitForSeconds(TimeStep);
             }
             
-            newBall.Move(_level.TargetPoint.position);
+            newBall.Move(_targetPoint.position);
         }
 
         private float ReduceScale(float percentStep)
@@ -89,7 +97,7 @@ namespace Game
                 
                 transform.localScale -= scale;
                 
-                _level.ScaleObjects(percentStep, scale);
+                _gameObjectScaler.ScaleObjects(percentStep, scale);
             }
 
             return currentPercent;
@@ -133,7 +141,7 @@ namespace Game
 
         private float CalculateDistanceToDoors(out List<Vector3> movementPoints, out float currentDistance)
         {
-            float distance = Vector3.Distance(transform.position, _level.TargetPoint.position);
+            float distance = Vector3.Distance(transform.position, _targetPoint.position);
 
             float distanceBetweenPoints = distance / JumpsCount;
 
@@ -147,13 +155,13 @@ namespace Game
         private void Subscribe()
         {
             _screenTouchReporter.OnScreenTouched += ScreenTouchHandler;
-            _level.OnWin += MoveToDoors;
+            _gameOverReporter.OnWin += MoveToDoors;
         }
 
         private void UnSubscribe()
         {
             _screenTouchReporter.OnScreenTouched -= ScreenTouchHandler;
-            _level.OnWin -= MoveToDoors;
+            _gameOverReporter.OnWin -= MoveToDoors;
         }
     }
 }

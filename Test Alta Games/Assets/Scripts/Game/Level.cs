@@ -2,12 +2,14 @@
 using System.Threading.Tasks;
 using Architecture.Services.Interfaces;
 using Data;
+using Game.Interfaces;
 using UnityEngine;
 using Zenject;
 
 namespace Game
 {
-    public class Level : MonoBehaviour
+    public class Level : MonoBehaviour, IGameOverReporter, 
+        IGameObjectScaler, IDestroyableBallCreator
     {
         public event Action OnWin;
         public event Action OnLose;
@@ -28,6 +30,11 @@ namespace Game
         {
             _gameSettings = gameSettings;
             _baseFactory = baseFactory;
+        }
+        
+        public void SendLose()
+        {
+            OnLose?.Invoke();
         }
         
         public async Task<DestroyableBall> CreateDestroyableBall(Transform baseBall, float diameter)
@@ -54,11 +61,6 @@ namespace Game
         {
             if (_pathLine.CheckIsHasObstaclesOnPath())
                 OnWin?.Invoke();
-        }
-
-        public void SendLose()
-        {
-            OnLose?.Invoke();
         }
     }
 }

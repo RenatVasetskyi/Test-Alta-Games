@@ -13,7 +13,7 @@ namespace Architecture.States
     {
         private const string GameScene = "Game";
         
-        private const float ScreenTouchReporterUnlockDelay = 1f;
+        private const float ScreenTouchReporterUnlockDelay = 0.5f;
         
         private readonly ISceneLoader _sceneLoader;
         private readonly IAudioService _audioService;
@@ -65,7 +65,9 @@ namespace Architecture.States
                 (_gameSettings.GameView, Vector3.zero, Quaternion.identity, parent)).GetComponent<GameView>();
             gameView.GetComponent<Canvas>().worldCamera = camera;
             
-            ball.Initialize(gameView.ScreenTouchReporter, level);
+            gameView.Initialize(level);
+            
+            ball.Initialize(gameView.ScreenTouchReporter, level, level, level, level.TargetPoint);
             
             _audioService.PlayMusic(MusicType.Game);
 
