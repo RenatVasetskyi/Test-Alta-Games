@@ -43,7 +43,7 @@ namespace Game
 
         private async void CreateNewBall()
         { 
-            DestroyableBall destroyableBall = await _level.CreateDestroyableBall(transform,_collider.radius);
+            DestroyableBall destroyableBall = await _level.CreateDestroyableBall(transform, _collider.radius * 2);
             
             StartCoroutine(ScaleBall(destroyableBall));
         }
@@ -56,7 +56,7 @@ namespace Game
 
                 if (ballCurrentScalePercent < CriticalScalePercent)
                 {
-                    Debug.Log("Lose");
+                    _level.SendLose();
                     
                     Destroy(gameObject);
                 }

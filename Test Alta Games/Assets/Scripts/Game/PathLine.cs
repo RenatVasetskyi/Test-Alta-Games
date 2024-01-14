@@ -22,13 +22,12 @@ namespace Game
                 transform.localScale -= new Vector3(0, 0, scaleToReduce);
         }
         
-        public void CheckIsHasObstaclesOnPath()
+        public bool CheckIsHasObstaclesOnPath()
         {
-            RaycastHit[] obstacles = Physics.BoxCastAll(transform.position, transform.lossyScale, 
-                Vector3.zero, transform.rotation, 0, _obstacleLayer);
-            
-            if (obstacles.Length == 0)
-                Debug.Log("Win");
+            Collider[] colliders = Physics.OverlapBox(_collider.bounds.center,
+                _collider.bounds.extents, Quaternion.identity, _obstacleLayer);
+
+            return colliders.Length == 0;
         }
 
         private void Awake()

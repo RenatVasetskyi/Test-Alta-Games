@@ -31,7 +31,8 @@ namespace Game
 
         public void Move(Vector3 to)
         {
-            _movementTween = LeanTween.move(gameObject, to, MovementDuration);
+            _movementTween = LeanTween.move(gameObject, to, MovementDuration)
+                .setOnComplete(DestroyAndCheckIsHasObstaclesOnPath);
         }
         
         private void OnCollisionEnter(Collision other)
@@ -65,6 +66,11 @@ namespace Game
             foreach (RaycastHit obstacle in obstacles)
                 Destroy(obstacle.collider.gameObject);
 
+            DestroyAndCheckIsHasObstaclesOnPath();
+        }
+
+        private void DestroyAndCheckIsHasObstaclesOnPath()
+        {
             _level.CheckIsHasObstaclesOnPath();
             
             Destroy(gameObject);

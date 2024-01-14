@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Architecture.Services.Interfaces;
 using Data;
 using UnityEngine;
@@ -8,6 +9,9 @@ namespace Game
 {
     public class Level : MonoBehaviour
     {
+        public event Action OnWin;
+        public event Action OnLose;
+        
         public Transform CameraSpawnPosition;
         public Transform BallSpawnPosition;
         public Transform TargetPoint;
@@ -26,11 +30,11 @@ namespace Game
             _baseFactory = baseFactory;
         }
         
-        public async Task<DestroyableBall> CreateDestroyableBall(Transform baseBall, float radius)
+        public async Task<DestroyableBall> CreateDestroyableBall(Transform baseBall, float diameter)
         {
             _newBall = (await _baseFactory.CreateAddressableWithContainer
                 (_gameSettings.DestroyableBall, baseBall.position + baseBall.right *
-                    radius * 2, Quaternion.identity, baseBall.parent))
+                    diameter * 2, Quaternion.identity, baseBall.parent))
                 .GetComponent<DestroyableBall>();
             
             _newBall.Initialize(this);
@@ -48,7 +52,13 @@ namespace Game
 
         public void CheckIsHasObstaclesOnPath()
         {
-            _pathLine.CheckIsHasObstaclesOnPath();
+            if (_pathLine.CheckIsHasObstaclesOnPath())
+                OnWin?.Invoke();
+        }
+
+        public void SendLose()
+        {
+            OnLose?.Invoke();
         }
     }
 }
