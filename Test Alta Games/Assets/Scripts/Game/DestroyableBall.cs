@@ -14,8 +14,15 @@ namespace Game
         
         [SerializeField] private LayerMask _obstacleLayer;
 
+        private Level _level;
+        
         private LTDescr _movementTween;
         private LTDescr _rotationTween;
+
+        public void Initialize(Level level)
+        {
+            _level = level;
+        }
 
         public void AddScale(Vector3 scale)
         {
@@ -57,6 +64,8 @@ namespace Game
 
             foreach (RaycastHit obstacle in obstacles)
                 Destroy(obstacle.collider.gameObject);
+
+            _level.CheckIsHasObstaclesOnPath();
             
             Destroy(gameObject);
         }

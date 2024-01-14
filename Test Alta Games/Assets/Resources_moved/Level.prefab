@@ -149,7 +149,7 @@ MonoBehaviour:
   CameraSpawnPosition: {fileID: 1286736438418554420}
   BallSpawnPosition: {fileID: 7608563670201825759}
   TargetPoint: {fileID: 7338188928454322780}
-  PathLine: {fileID: 8162691255282823232}
+  _pathLine: {fileID: 8162691255282823232}
 --- !u!1 &4106080247384850540
 GameObject:
   m_ObjectHideFlags: 0

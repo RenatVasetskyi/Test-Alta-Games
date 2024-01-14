@@ -1,9 +1,6 @@
 ﻿using System.Collections;
-using Architecture.Services.Interfaces;
-using Data;
 using UI.Game.Interfaces;
 using UnityEngine;
-using Zenject;
 
 namespace Game
 {
@@ -17,33 +14,19 @@ namespace Game
         
         [SerializeField] private SphereCollider _collider;
 
-        private GameSettings _gameSettings;
-        private IBaseFactory _baseFactory;
-        
         private IScreenTouchReporter _screenTouchReporter;
-        private PathLine _pathLine;
+        private Level _level;
         
         private DestroyableBall _destroyableBallPrefab;
         
         private bool _isScreenTouched;
 
         private float _startScale;
-
-        private Transform _targetPoint;
         
-        [Inject]
-        public void Construct(GameSettings gameSettings, IBaseFactory baseFactory)
-        {
-            _gameSettings = gameSettings;
-            _baseFactory = baseFactory;
-        }
-        
-        public void Initialize(IScreenTouchReporter screenTouchReporter, PathLine pathLine, 
-            Transform targetPoint)
+        public void Initialize(IScreenTouchReporter screenTouchReporter, Level level)
         {
             _screenTouchReporter = screenTouchReporter;
-            _pathLine = pathLine;
-            _targetPoint = targetPoint;
+            _level = level;
 
             Subscribe();
         }
@@ -60,21 +43,16 @@ namespace Game
 
         private async void CreateNewBall()
         { 
-            DestroyableBall newBall = (await _baseFactory.CreateAddressableWithContainer
-                (_gameSettings.DestroyableBall, transform.position + transform.right *
-                    _collider.radius * 2, Quaternion.identity, transform.parent))
-                .GetComponent<DestroyableBall>();
+            DestroyableBall destroyableBall = await _level.CreateDestroyableBall(transform,_collider.radius);
             
-            newBall.transform.localScale = Vector3.zero;
-            
-            StartCoroutine(ScaleBall(newBall));
+            StartCoroutine(ScaleBall(destroyableBall));
         }
 
         private IEnumerator ScaleBall(DestroyableBall newBall)
         {
             while (_isScreenTouched)
             {
-                float ballCurrentScalePercent = ReduceScale(newBall, ScalePercentStep);
+                float ballCurrentScalePercent = ReduceScale(ScalePercentStep);
 
                 if (ballCurrentScalePercent < CriticalScalePercent)
                 {
@@ -82,18 +60,14 @@ namespace Game
                     
                     Destroy(gameObject);
                 }
-                else
-                {
-                    _pathLine.ReduceScale(ScalePercentStep);
-                }
                 
                 yield return new WaitForSeconds(TimeStep);
             }
             
-            newBall.Move(_targetPoint.position);
+            newBall.Move(_level.TargetPoint.position);
         }
 
-        private float ReduceScale(DestroyableBall newBall, float percentStep)
+        private float ReduceScale(float percentStep)
         {
             float currentPercent = transform.localScale.y * MaxScalePercent / _startScale;
             
@@ -105,7 +79,7 @@ namespace Game
                 
                 transform.localScale -= scale;
                 
-                newBall.AddScale(scale);
+                _level.ScaleObjects(percentStep, scale);
             }
 
             return currentPercent;
