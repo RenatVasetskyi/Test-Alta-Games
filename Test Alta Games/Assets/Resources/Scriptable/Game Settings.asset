@@ -47,3 +47,8 @@ MonoBehaviour:
     m_SubObjectName: 
     m_SubObjectType: 
     m_EditorAssetChanged: 0
+  UICamera:
+    m_AssetGUID: a624d7eae51b5564d99cde0039d33834
+    m_SubObjectName: 
+    m_SubObjectType: 
+    m_EditorAssetChanged: 0

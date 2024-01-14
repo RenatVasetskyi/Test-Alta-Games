@@ -1,4 +1,3 @@
-using Game;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 
@@ -16,5 +15,6 @@ namespace Data
         public AssetReferenceGameObject Ball;
         public AssetReferenceGameObject GameView;
         public AssetReferenceGameObject DestroyableBall;
+        public AssetReferenceGameObject UICamera;
     }
 }

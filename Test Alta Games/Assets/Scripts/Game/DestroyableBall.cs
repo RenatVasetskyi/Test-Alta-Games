@@ -1,5 +1,4 @@
-﻿using System.Threading.Tasks;
-using Game.Data;
+﻿using Game.Data;
 using Game.Interfaces;
 using UnityEngine;
 

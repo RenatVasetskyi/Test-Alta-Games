@@ -57,13 +57,17 @@ namespace Architecture.States
             Ball ball = (await _baseFactory.CreateAddressableWithContainer
                 (_gameSettings.Ball, level.BallSpawnPosition.position, Quaternion.identity, parent)).GetComponent<Ball>();
             
-            Camera camera = (await _baseFactory.CreateAddressableWithContainer
+            GameObject gameCamera = (await _baseFactory.CreateAddressableWithContainer
             (_gameSettings.BaseCamera, level.CameraSpawnPosition.position,
+                level.CameraSpawnPosition.rotation, parent));
+            
+            Camera uiCamera = (await _baseFactory.CreateAddressableWithContainer
+            (_gameSettings.UICamera, level.CameraSpawnPosition.position,
                 level.CameraSpawnPosition.rotation, parent)).GetComponent<Camera>();
             
             GameView gameView = (await _baseFactory.CreateAddressableWithContainer
                 (_gameSettings.GameView, Vector3.zero, Quaternion.identity, parent)).GetComponent<GameView>();
-            gameView.GetComponent<Canvas>().worldCamera = camera;
+            gameView.GetComponent<Canvas>().worldCamera = uiCamera;
             
             gameView.Initialize(level);
             
