@@ -1,4 +1,6 @@
-﻿using Game.Data;
+﻿using System.Threading.Tasks;
+using Game.Data;
+using Game.Interfaces;
 using UnityEngine;
 
 namespace Game
@@ -43,7 +45,7 @@ namespace Game
                 {
                     StopMovement();
                     
-                    DetectObstaclesAndDestroy();
+                    DetectObstaclesAndHide();
                 }
             }
         }
@@ -56,7 +58,7 @@ namespace Game
             _rigidbody.isKinematic = true;
         }
 
-        private void DetectObstaclesAndDestroy()
+        private void DetectObstaclesAndHide()
         {
             float detectRadius = (_collider.radius * 2) * transform.localScale.y;
             
@@ -64,7 +66,10 @@ namespace Game
                 transform.right * detectRadius, detectRadius, _obstacleLayer);
 
             foreach (RaycastHit obstacle in obstacles)
-                Destroy(obstacle.collider.gameObject);
+            {
+                if (obstacle.collider.gameObject.TryGetComponent(out IHideable hideable)) 
+                    hideable.Hide();                    
+            }
 
             DestroyAndCheckIsHasObstaclesOnPath();
         }

@@ -1,4 +1,6 @@
 ﻿using System.Collections;
+using System.Collections.Generic;
+using DG.Tweening;
 using UI.Game.Interfaces;
 using UnityEngine;
 
@@ -6,6 +8,10 @@ namespace Game
 {
     public class Ball : MonoBehaviour
     {
+        private const int JumpsCount = 12;
+        private const float JumpHeight = 1.5f;
+        private const float MoveToDoorsDuration = 6f;
+        
         private const float ScalePercentStep = 1f;
         private const float TimeStep = 0.05f;
 
@@ -14,6 +20,10 @@ namespace Game
         
         [SerializeField] private SphereCollider _collider;
 
+        [Space]
+        
+        [SerializeField] private Ease _jumpEasing; 
+        
         private IScreenTouchReporter _screenTouchReporter;
         private Level _level;
         
@@ -92,15 +102,58 @@ namespace Game
             if (isTouched)
                 CreateNewBall();
         }
-        
+
+        private void MoveToDoors()
+        {
+            float distanceBetweenPoints = CalculateDistanceToDoors
+                (out List<Vector3> movementPoints, out float currentDistance);
+
+            for (int i = 0; i < JumpsCount; i++)
+            {
+                Vector3 pointToMove;
+
+                if (i % 2 == 0)
+                {
+                    pointToMove = transform.position + (transform
+                        .right * currentDistance) + new Vector3(0, JumpHeight, 0);
+                }
+                else
+                {
+                    pointToMove = transform.position + (transform.right * currentDistance);
+                }
+
+                movementPoints.Add(pointToMove);
+
+                currentDistance += distanceBetweenPoints;
+            }
+            
+            transform.DOPath(movementPoints.ToArray(), MoveToDoorsDuration)
+                .SetEase(_jumpEasing);
+        }
+
+        private float CalculateDistanceToDoors(out List<Vector3> movementPoints, out float currentDistance)
+        {
+            float distance = Vector3.Distance(transform.position, _level.TargetPoint.position);
+
+            float distanceBetweenPoints = distance / JumpsCount;
+
+            movementPoints = new();
+
+            currentDistance = distanceBetweenPoints;
+            
+            return distanceBetweenPoints;
+        }
+
         private void Subscribe()
         {
             _screenTouchReporter.OnScreenTouched += ScreenTouchHandler;
+            _level.OnWin += MoveToDoors;
         }
 
         private void UnSubscribe()
         {
             _screenTouchReporter.OnScreenTouched -= ScreenTouchHandler;
+            _level.OnWin -= MoveToDoors;
         }
     }
 }
