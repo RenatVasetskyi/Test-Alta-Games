@@ -71,7 +71,7 @@ namespace Architecture.States
             
             gameView.Initialize(level);
             
-            ball.Initialize(gameView.ScreenTouchReporter, level, level, level, level.TargetPoint);
+            ball.Initialize(gameView.ScreenTouchReporter, level, level, level, _coroutineRunner, level.TargetPoint);
             
             _audioService.PlayMusic(MusicType.Game);
 

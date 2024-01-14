@@ -1,8 +1,8 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using Architecture.Services.Interfaces;
 using DG.Tweening;
-using Game.Enums;
 using Game.Interfaces;
+using Game.States;
+using Game.States.Interfaces;
 using UI.Game.Interfaces;
 using UnityEngine;
 
@@ -10,48 +10,43 @@ namespace Game
 {
     public class Ball : MonoBehaviour
     {
-        private const int JumpsCount = 12;
-        private const float JumpHeight = 1.5f;
-        private const float MoveToDoorsDuration = 6f;
-        
-        private const float ScalePercentStep = 1f;
-        private const float TimeStep = 0.05f;
-
-        private const int CriticalScalePercent = 10;
-        private const int MaxScalePercent = 100;
-        
         [SerializeField] private SphereCollider _collider;
 
         [Space]
         
-        [SerializeField] private Ease _jumpEasing; 
+        [SerializeField] private Ease _jumpEasing;
         
         private IScreenTouchReporter _screenTouchReporter;
         private IGameOverReporter _gameOverReporter;
-        private IGameObjectScaler _gameObjectScaler;
         private IDestroyableBallCreator _destroyableBallCreator;
-        private Transform _targetPoint;
         
-        private bool _isScreenTouched;
+        public Transform TargetPoint { get; private set; }
+        public float StartScale { get; private set; }
+        public DestroyableBall NewBall { get; private set; }
+        public Ease JumpEasing => _jumpEasing;
+        public bool IsScreenTouched { get; private set; }
 
-        private float _startScale;
+        private BallStateMachine _stateMachine;
 
         public void Initialize(IScreenTouchReporter screenTouchReporter, IGameOverReporter gameOverReporter, 
             IGameObjectScaler gameObjectScaler, IDestroyableBallCreator destroyableBallCreator, 
-            Transform targetPoint)
+            ICoroutineRunner coroutineRunner, Transform targetPoint)
         {
             _screenTouchReporter = screenTouchReporter;
             _gameOverReporter = gameOverReporter;
-            _gameObjectScaler = gameObjectScaler;
             _destroyableBallCreator = destroyableBallCreator;
-            _targetPoint = targetPoint;
+            
+            TargetPoint = targetPoint;
+            StartScale = transform.localScale.y;
 
+            _stateMachine = new BallStateMachine();
+            
+            StateFactory stateFactory = new StateFactory(_stateMachine, coroutineRunner,
+                gameObjectScaler, gameOverReporter, this);
+            
+            _stateMachine.Enter<BallIdleState>();
+            
             Subscribe();
-        }
-
-        private void Awake()
-        {
-            _startScale = transform.localScale.y;
         }
 
         private void OnDestroy()
@@ -61,108 +56,93 @@ namespace Game
 
         private async void CreateNewBall()
         { 
-            DestroyableBall destroyableBall = await _destroyableBallCreator
+            NewBall = await _destroyableBallCreator
                 .CreateDestroyableBall(transform, _collider.radius * 2);
             
-            StartCoroutine(ScaleBall(destroyableBall));
+            EnterScaleState();
         }
 
-        private IEnumerator ScaleBall(DestroyableBall newBall)
+        private void ScaleBalls(bool isTouched)
         {
-            while (_isScreenTouched)
-            {
-                float ballCurrentScalePercent = ReduceScale(ScalePercentStep);
-
-                if (ballCurrentScalePercent < CriticalScalePercent)
-                {
-                    _gameOverReporter.SendLose();
-                    
-                    Destroy(gameObject);
-                }
-                
-                yield return new WaitForSeconds(TimeStep);
-            }
-            
-            newBall.Move(_targetPoint.position);
-        }
-
-        private float ReduceScale(float percentStep)
-        {
-            float currentPercent = transform.localScale.y * MaxScalePercent / _startScale;
-            
-            float scaleToReduce = (_startScale / MaxScalePercent) * percentStep;
-
-            if (currentPercent > percentStep)
-            {
-                Vector3 scale = new Vector3(scaleToReduce, scaleToReduce, scaleToReduce);
-                
-                transform.localScale -= scale;
-                
-                _gameObjectScaler.ScaleObjects(percentStep, scale);
-            }
-
-            return currentPercent;
-        }
-
-        private void ScreenTouchHandler(bool isTouched)
-        {
-            _isScreenTouched = isTouched;
+            IsScreenTouched = isTouched;
             
             if (isTouched)
                 CreateNewBall();
+            else
+                EnterIdleState();
         }
-
-        private void MoveToDoors()
-        {
-            float distanceBetweenPoints = CalculateDistanceToDoors
-                (out List<Vector3> movementPoints, out float currentDistance);
-
-            for (int i = 0; i < JumpsCount; i++)
-            {
-                Vector3 pointToMove;
-
-                if (i % 2 == 0)
-                {
-                    pointToMove = transform.position + (transform
-                        .right * currentDistance) + new Vector3(0, JumpHeight, 0);
-                }
-                else
-                {
-                    pointToMove = transform.position + (transform.right * currentDistance);
-                }
-
-                movementPoints.Add(pointToMove);
-
-                currentDistance += distanceBetweenPoints;
-            }
-            
-            transform.DOPath(movementPoints.ToArray(), MoveToDoorsDuration)
-                .SetEase(_jumpEasing);
-        }
-
-        private float CalculateDistanceToDoors(out List<Vector3> movementPoints, out float currentDistance)
-        {
-            float distance = Vector3.Distance(transform.position, _targetPoint.position);
-
-            float distanceBetweenPoints = distance / JumpsCount;
-
-            movementPoints = new();
-
-            currentDistance = distanceBetweenPoints;
-            
-            return distanceBetweenPoints;
-        }
-
+        
         private void Subscribe()
         {
-            _screenTouchReporter.OnScreenTouched += ScreenTouchHandler;
-            _gameOverReporter.OnWin += MoveToDoors;
+            _screenTouchReporter.OnScreenTouched += ScaleBalls;
+            _gameOverReporter.OnWin += EnterMoveToDoorState;
         }
 
         private void UnSubscribe()
         {
-            _screenTouchReporter.OnScreenTouched -= ScreenTouchHandler;
-            _gameOverReporter.OnWin -= MoveToDoors;
+            _screenTouchReporter.OnScreenTouched -= ScaleBalls;
+            _gameOverReporter.OnWin -= EnterMoveToDoorState;
+        }
+
+        private void EnterScaleState()
+        {
+            if (_stateMachine.CompareStateWithActive<BallIdleState>()) 
+                _stateMachine.Enter<BallScaleState>();
+        }
+        
+        private void EnterMoveToDoorState()
+        {
+            _stateMachine.Enter<BallMoveToDoorsState>();
+        }
+
+        private void EnterIdleState()
+        {
+            _stateMachine.Enter<BallIdleState>();
+        }
+
+        private class StateFactory
+        {
+            private readonly IBallStateMachine _stateMachine;
+            private readonly ICoroutineRunner _coroutineRunner;
+            private readonly IGameObjectScaler _gameObjectScaler;
+            private readonly IGameOverReporter _gameOverReporter;
+            private readonly Ball _ball;
+
+            public StateFactory(IBallStateMachine stateMachine, ICoroutineRunner coroutineRunner, 
+                IGameObjectScaler gameObjectScaler, IGameOverReporter gameOverReporter, Ball ball)
+            {
+                _stateMachine = stateMachine;
+                _coroutineRunner = coroutineRunner;
+                _gameObjectScaler = gameObjectScaler;
+                _gameOverReporter = gameOverReporter;
+                _ball = ball;
+
+                CreateStates();
+            }
+
+            private void CreateStates()
+            {
+                CreateBallScaleState();
+                CreateBallMoveToDoorState();
+                CreateBallIdleState();
+            }
+
+            private void CreateBallScaleState()
+            {
+                _stateMachine.AddState<BallScaleState>(new BallScaleState
+                    (_coroutineRunner, _gameOverReporter, _gameObjectScaler, _ball));
+            }
+
+            private void CreateBallMoveToDoorState()
+            {
+                _stateMachine.AddState<BallMoveToDoorsState>
+                    (new BallMoveToDoorsState(_ball));
+            }
+
+            private void CreateBallIdleState()
+            {
+                _stateMachine.AddState<BallIdleState>(new BallIdleState());
+            }
         }
     }
 }
