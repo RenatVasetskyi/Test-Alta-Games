@@ -15,13 +15,15 @@ namespace Game.States
         private const int MaxScalePercent = 100;
         
         private readonly IGameObjectScaler _gameObjectScaler;
+        private readonly IBallStateMachine _stateMachine;
         private readonly ICoroutineRunner _coroutineRunner;
         private readonly IGameOverReporter _gameOverReporter;
         private readonly Ball _ball;
         
-        public BallScaleState(ICoroutineRunner coroutineRunner, IGameOverReporter gameOverReporter,
-            IGameObjectScaler gameObjectScaler, Ball ball)
+        public BallScaleState(IBallStateMachine stateMachine, ICoroutineRunner coroutineRunner,
+            IGameOverReporter gameOverReporter, IGameObjectScaler gameObjectScaler, Ball ball)
         {
+            _stateMachine = stateMachine;
             _coroutineRunner = coroutineRunner;
             _gameOverReporter = gameOverReporter;
             _gameObjectScaler = gameObjectScaler;
@@ -44,11 +46,17 @@ namespace Game.States
                 float ballCurrentScalePercent = ReduceScale(ScalePercentStep);
 
                 if (ballCurrentScalePercent < CriticalScalePercent)
+                {
+                    _stateMachine.Enter<BallLoseState>();
+                    
                     _gameOverReporter.SendLose();
+                    
+                    yield break;
+                }
                 
                 yield return new WaitForSeconds(TimeStep);
             }
-            
+
             _ball.NewBall.Move(_ball.TargetPoint.position);
         }
 

@@ -35,7 +35,7 @@ namespace Game
             _movementTween = LeanTween.move(gameObject, to, MovementDuration)
                 .setOnComplete(DestroyAndCheckIsHasObstaclesOnPath);
         }
-        
+
         private void OnCollisionEnter(Collision other)
         {
             if (other.gameObject.layer == Layers.ObstacleLayerNumber)

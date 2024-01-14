@@ -5,6 +5,6 @@ namespace Game.Interfaces
 {
     public interface IDestroyableBallCreator
     {
-        Task<DestroyableBall> CreateDestroyableBall(Transform baseBall, float diameter);
+        Task<DestroyableBall> CreateDestroyableBall(Ball baseBall, float diameter);
     }
 }

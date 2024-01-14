@@ -41,11 +41,11 @@ namespace Game
             _stateMachine = stateMachine;
         }
         
-        public async Task<DestroyableBall> CreateDestroyableBall(Transform baseBall, float diameter)
+        public async Task<DestroyableBall> CreateDestroyableBall(Ball baseBall, float diameter)
         {
             _newBall = (await _baseFactory.CreateAddressableWithContainer
-                (_gameSettings.DestroyableBall, baseBall.position + baseBall.right *
-                    diameter * 2, Quaternion.identity, baseBall.parent))
+                (_gameSettings.DestroyableBall, baseBall.transform.position + baseBall.transform.right *
+                    diameter * 2, Quaternion.identity, baseBall.transform.parent))
                 .GetComponent<DestroyableBall>();
             
             _newBall.Initialize(this);

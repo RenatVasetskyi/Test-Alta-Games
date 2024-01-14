@@ -20,13 +20,13 @@ namespace Game
         private IGameOverReporter _gameOverReporter;
         private IDestroyableBallCreator _destroyableBallCreator;
         
+        private BallStateMachine _stateMachine;
+        
         public Transform TargetPoint { get; private set; }
         public float StartScale { get; private set; }
         public DestroyableBall NewBall { get; private set; }
-        public Ease JumpEasing => _jumpEasing;
         public bool IsScreenTouched { get; private set; }
-
-        private BallStateMachine _stateMachine;
+        public Ease JumpEasing => _jumpEasing;
 
         public void Initialize(IScreenTouchReporter screenTouchReporter, IGameOverReporter gameOverReporter, 
             IGameObjectScaler gameObjectScaler, IDestroyableBallCreator destroyableBallCreator, 
@@ -57,7 +57,7 @@ namespace Game
         private async void CreateNewBall()
         { 
             NewBall = await _destroyableBallCreator
-                .CreateDestroyableBall(transform, _collider.radius * 2);
+                .CreateDestroyableBall(this, _collider.radius * 2);
             
             EnterScaleState();
         }
@@ -65,11 +65,16 @@ namespace Game
         private void ScaleBalls(bool isTouched)
         {
             IsScreenTouched = isTouched;
+
+            if (_stateMachine.CompareStateWithActive<BallLoseState>() |
+                _stateMachine.CompareStateWithActive<BallMoveToDoorsState>() | 
+                NewBall != null)
+                return;
             
             if (isTouched)
                 CreateNewBall();
             else
-                EnterIdleState();
+                EnterIdleState();   
         }
         
         private void Subscribe()
@@ -86,8 +91,7 @@ namespace Game
 
         private void EnterScaleState()
         {
-            if (_stateMachine.CompareStateWithActive<BallIdleState>()) 
-                _stateMachine.Enter<BallScaleState>();
+            _stateMachine.Enter<BallScaleState>();
         }
         
         private void EnterMoveToDoorState()
@@ -99,7 +103,7 @@ namespace Game
         {
             _stateMachine.Enter<BallIdleState>();
         }
-
+        
         private class StateFactory
         {
             private readonly IBallStateMachine _stateMachine;
@@ -125,12 +129,13 @@ namespace Game
                 CreateBallScaleState();
                 CreateBallMoveToDoorState();
                 CreateBallIdleState();
+                CreateBallLoseState();
             }
 
             private void CreateBallScaleState()
             {
                 _stateMachine.AddState<BallScaleState>(new BallScaleState
-                    (_coroutineRunner, _gameOverReporter, _gameObjectScaler, _ball));
+                    (_stateMachine, _coroutineRunner, _gameOverReporter, _gameObjectScaler, _ball));
             }
 
             private void CreateBallMoveToDoorState()
@@ -142,6 +147,11 @@ namespace Game
             private void CreateBallIdleState()
             {
                 _stateMachine.AddState<BallIdleState>(new BallIdleState());
+            }
+            
+            private void CreateBallLoseState()
+            {
+                _stateMachine.AddState<BallLoseState>(new BallLoseState());
             }
         }
     }
