@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using DG.Tweening;
+using Game.Enums;
 using Game.Interfaces;
 using UI.Game.Interfaces;
 using UnityEngine;
@@ -34,7 +35,7 @@ namespace Game
         private bool _isScreenTouched;
 
         private float _startScale;
-        
+
         public void Initialize(IScreenTouchReporter screenTouchReporter, IGameOverReporter gameOverReporter, 
             IGameObjectScaler gameObjectScaler, IDestroyableBallCreator destroyableBallCreator, 
             Transform targetPoint)
