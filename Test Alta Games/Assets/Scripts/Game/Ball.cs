@@ -32,8 +32,8 @@ namespace Game
         public Ease JumpEasing => _jumpEasing;
         public Ease RotateEasing => _rotateEasing;
 
-        public void Initialize(IScreenTouchReporter screenTouchReporter, IGameOverReporter gameOverReporter, 
-            IGameObjectScaler gameObjectScaler, IDestroyableBallCreator destroyableBallCreator, 
+        public void Initialize(IScreenTouchReporter screenTouchReporter, IGameOverReporter gameOverReporter,
+            IGameObjectScaler gameObjectScaler, IDestroyableBallCreator destroyableBallCreator,
             ICoroutineRunner coroutineRunner, Transform targetPoint)
         {
             _screenTouchReporter = screenTouchReporter;

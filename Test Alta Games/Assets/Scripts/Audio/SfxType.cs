@@ -2,6 +2,8 @@ namespace Audio
 {
     public enum SfxType 
     {
-        UIClick = 0,
+        BallDestroy = 0,
+        Victory = 1,
+        Lose = 2,
     }
 }

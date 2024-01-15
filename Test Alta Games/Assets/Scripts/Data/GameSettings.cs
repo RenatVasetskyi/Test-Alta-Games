@@ -17,5 +17,7 @@ namespace Data
         public AssetReferenceGameObject DestroyableBall;
         public AssetReferenceGameObject UICamera;
         public AssetReferenceGameObject LoadingCurtain;
+        public AssetReferenceGameObject SfxAudioSource;
+        public AssetReferenceGameObject MusicAudioSource;
     }
 }

@@ -1,6 +1,9 @@
-﻿using Game.Data;
+﻿using Architecture.Services.Interfaces;
+using Audio;
+using Game.Data;
 using Game.Interfaces;
 using UnityEngine;
+using Zenject;
 
 namespace Game
 {
@@ -15,11 +18,19 @@ namespace Game
         
         [SerializeField] private LayerMask _obstacleLayer;
 
+        private IAudioService _audioService;
+        
         private Level _level;
         
         private LTDescr _movementTween;
         private LTDescr _rotationTween;
 
+        [Inject]
+        public void Construct(IAudioService audioService)
+        {
+            _audioService = audioService;
+        }
+        
         public void Initialize(Level level)
         {
             _level = level;
@@ -76,6 +87,8 @@ namespace Game
         private void DestroyAndCheckIsHasObstaclesOnPath()
         {
             _level.CheckIsHasObstaclesOnPath();
+            
+            _audioService.PlaySfx(SfxType.BallDestroy);
             
             Destroy(gameObject);
         }

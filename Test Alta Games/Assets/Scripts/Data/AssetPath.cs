@@ -4,7 +4,7 @@ namespace Data
     {
         public const string SfxHolder = "Scriptable/Audio/SfxHolder";
         public const string MusicHolder = "Scriptable/Audio/MusicHolder";
-        public const string SfxAudioSource = "Prefabs/Audio/SfxAudioSource";
-        public const string MusicAudioSource = "Prefabs/Audio/MusicAudioSource";
+        public const string SfxAudioSource = "Assets/Resources_moved/Audio/SfxAudioSource";
+        public const string MusicAudioSource = "Assets/Resources_moved/Audio/MusicAudioSource";
     }
 }

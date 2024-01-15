@@ -1,5 +1,8 @@
-﻿using Game.Interfaces;
+﻿using Architecture.Services.Interfaces;
+using Audio;
+using Game.Interfaces;
 using UnityEngine;
+using Zenject;
 
 namespace UI.Game
 {
@@ -9,9 +12,17 @@ namespace UI.Game
 
         [SerializeField] private GameOverWindow _victoryWindow;
         [SerializeField] private GameOverWindow _loseWindow;
+
+        private IAudioService _audioService;
         
         private IGameOverReporter _gameOverReporter;
 
+        [Inject]
+        public void Construct(IAudioService audioService)
+        {
+            _audioService = audioService;
+        }
+        
         public void Initialize(IGameOverReporter gameOverReporter)
         {
             _gameOverReporter = gameOverReporter;
@@ -35,6 +46,10 @@ namespace UI.Game
             _victoryWindow.gameObject.SetActive(true);
 
             _victoryWindow.ShowText();
+            
+            _audioService.StopMusic();
+            
+            _audioService.PlaySfx(SfxType.Victory);
         }
 
         private void ShowLoseWindow()
@@ -42,6 +57,10 @@ namespace UI.Game
             _loseWindow.gameObject.SetActive(true);
 
             _loseWindow.ShowText();
+            
+            _audioService.StopMusic();
+            
+            _audioService.PlaySfx(SfxType.Lose);
         }
 
         private void Subscribe()

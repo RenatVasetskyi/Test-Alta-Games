@@ -36,8 +36,6 @@ namespace UI.Base
 
         protected virtual void ChangeState()
         {
-            _audioService.PlaySfx(SfxType.UIClick);
-            
             switch (_stateType)
             {
                 case StateType.None:

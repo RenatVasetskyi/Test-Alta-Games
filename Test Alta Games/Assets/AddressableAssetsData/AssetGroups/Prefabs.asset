@@ -53,6 +53,14 @@ MonoBehaviour:
     m_Address: LoadingCurtain
     m_ReadOnly: 0
     m_SerializedLabels: []
+  - m_GUID: 35f80802aaba1ad44a7f4c8cff5cd9d1
+    m_Address: MusicAudioSource
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: b7e4abb64d0069246a22e133bf8df064
+    m_Address: SfxAudioSource
+    m_ReadOnly: 0
+    m_SerializedLabels: []
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: 42bc2f5c9e5f09c46bdb822c84de0c05, type: 2}
   m_SchemaSet:
