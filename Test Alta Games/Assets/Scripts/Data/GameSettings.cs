@@ -16,5 +16,6 @@ namespace Data
         public AssetReferenceGameObject GameView;
         public AssetReferenceGameObject DestroyableBall;
         public AssetReferenceGameObject UICamera;
+        public AssetReferenceGameObject LoadingCurtain;
     }
 }

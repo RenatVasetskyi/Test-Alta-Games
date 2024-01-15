@@ -52,3 +52,8 @@ MonoBehaviour:
     m_SubObjectName: 
     m_SubObjectType: 
     m_EditorAssetChanged: 0
+  LoadingCurtain:
+    m_AssetGUID: dab9e5d13d82317438cc91ecd8b5d090
+    m_SubObjectName: 
+    m_SubObjectType: 
+    m_EditorAssetChanged: 0

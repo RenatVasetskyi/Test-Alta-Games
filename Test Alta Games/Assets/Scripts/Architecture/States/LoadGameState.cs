@@ -4,6 +4,7 @@ using Architecture.States.Interfaces;
 using Audio;
 using Data;
 using Game;
+using UI.Base;
 using UI.Game;
 using UnityEngine;
 
@@ -48,6 +49,10 @@ namespace Architecture.States
 
         private async void Initialize()
         {
+            LoadingCurtain loadingCurtain = (await _baseFactory.CreateAddressableWithObject
+                (_gameSettings.LoadingCurtain, Vector3.zero, Quaternion.identity, null)).GetComponent<LoadingCurtain>();
+            loadingCurtain.Show();
+            
             Transform parent = (await _baseFactory.CreateAddressableWithObject
                 (_gameSettings.BaseParent, Vector3.zero, Quaternion.identity, null)).transform;
             
@@ -76,6 +81,8 @@ namespace Architecture.States
             _audioService.PlayMusic(MusicType.Game);
 
             _coroutineRunner.StartCoroutine(UnlockScreenTouchReporter(gameView.ScreenTouchReporter));
+            
+            loadingCurtain.Hide();
         }
 
         private IEnumerator UnlockScreenTouchReporter(ScreenTouchReporter screenTouchReporter)

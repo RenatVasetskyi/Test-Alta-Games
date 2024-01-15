@@ -49,6 +49,10 @@ MonoBehaviour:
     m_Address: UICamera
     m_ReadOnly: 0
     m_SerializedLabels: []
+  - m_GUID: dab9e5d13d82317438cc91ecd8b5d090
+    m_Address: LoadingCurtain
+    m_ReadOnly: 0
+    m_SerializedLabels: []
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: 42bc2f5c9e5f09c46bdb822c84de0c05, type: 2}
   m_SchemaSet:
