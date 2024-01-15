@@ -90,6 +90,8 @@ namespace Architecture.States
             yield return new WaitForSeconds(ScreenTouchReporterUnlockDelay);
             
             screenTouchReporter.SetLockState(false);
+            
+            _assetProvider.CleanUp();
         }
     }
 }
