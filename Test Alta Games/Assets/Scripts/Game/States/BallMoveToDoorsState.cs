@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using DG.Tweening;
+﻿using DG.Tweening;
 using Game.States.Interfaces;
 using UnityEngine;
 
@@ -7,11 +6,15 @@ namespace Game.States
 {
     public class BallMoveToDoorsState : IBallState
     {
-        private const int JumpsCount = 12;
-        private const float JumpHeight = 1.5f;
+        private const int JumpsCount = 8;
+        private const float JumpPower = 2f;
         private const float MoveToDoorsDuration = 6f;
+        private const float RotationDuration = 1f;
 
+        private readonly Vector3 _rotationStep = new(0, 0, -360);
         private readonly Ball _ball;
+
+        private bool _isReachedTarget;
 
         public BallMoveToDoorsState(Ball ball)
         {
@@ -29,43 +32,22 @@ namespace Game.States
         
         private void MoveToDoors()
         {
-            float distanceBetweenPoints = CalculateDistanceToDoors
-                (out List<Vector3> movementPoints, out float currentDistance);
+            _ball.transform.DOJump(_ball.TargetPoint.position, JumpPower, JumpsCount, MoveToDoorsDuration)
+                .SetEase(_ball.JumpEasing).onComplete += () => _isReachedTarget = true;
 
-            for (int i = 0; i < JumpsCount; i++)
-            {
-                Vector3 pointToMove;
-
-                if (i % 2 == 0)
-                {
-                    pointToMove = _ball.transform.position + (_ball.transform
-                        .right * currentDistance) + new Vector3(0, JumpHeight, 0);
-                }
-                else
-                {
-                    pointToMove = _ball.transform.position + (_ball.transform.right * currentDistance);
-                }
-
-                movementPoints.Add(pointToMove);
-
-                currentDistance += distanceBetweenPoints;
-            }
-            
-            _ball.transform.DOPath(movementPoints.ToArray(), MoveToDoorsDuration)
-                .SetEase(_ball.JumpEasing);
+            Rotate();
         }
 
-        private float CalculateDistanceToDoors(out List<Vector3> movementPoints, out float currentDistance)
+        private void Rotate()
         {
-            float distance = Vector3.Distance(_ball.transform.position, _ball.TargetPoint.position);
-
-            float distanceBetweenPoints = distance / JumpsCount;
-
-            movementPoints = new();
-
-            currentDistance = distanceBetweenPoints;
+            if (_isReachedTarget)
+                return;
             
-            return distanceBetweenPoints;
+            Vector3 targetRotation = new Vector3(_ball.Renderer.transform.rotation.x,
+                _ball.Renderer.transform.rotation.y, _ball.Renderer.transform.rotation.z) + _rotationStep;
+            
+            _ball.Renderer.transform.DORotate(targetRotation, RotationDuration, RotateMode.FastBeyond360)
+                .SetEase(_ball.RotateEasing).onComplete += Rotate;
         }
     }
 }

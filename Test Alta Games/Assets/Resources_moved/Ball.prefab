@@ -77,7 +77,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _collider: {fileID: 5756517099540520901}
-  _jumpEasing: 1
+  _renderer: {fileID: 8334998766315050189}
+  _jumpEasing: 32
+  _rotateEasing: 1
 --- !u!1 &8334998766315050189
 GameObject:
   m_ObjectHideFlags: 0

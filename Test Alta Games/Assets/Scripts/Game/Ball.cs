@@ -11,22 +11,26 @@ namespace Game
     public class Ball : MonoBehaviour
     {
         [SerializeField] private SphereCollider _collider;
+        [SerializeField] private GameObject _renderer;
 
         [Space]
         
         [SerializeField] private Ease _jumpEasing;
+        [SerializeField] private Ease _rotateEasing;
         
         private IScreenTouchReporter _screenTouchReporter;
         private IGameOverReporter _gameOverReporter;
         private IDestroyableBallCreator _destroyableBallCreator;
         
         private BallStateMachine _stateMachine;
-        
+
         public Transform TargetPoint { get; private set; }
         public float StartScale { get; private set; }
         public DestroyableBall NewBall { get; private set; }
         public bool IsScreenTouched { get; private set; }
+        public GameObject Renderer => _renderer;
         public Ease JumpEasing => _jumpEasing;
+        public Ease RotateEasing => _rotateEasing;
 
         public void Initialize(IScreenTouchReporter screenTouchReporter, IGameOverReporter gameOverReporter, 
             IGameObjectScaler gameObjectScaler, IDestroyableBallCreator destroyableBallCreator, 
