@@ -6,7 +6,7 @@ namespace Game
 {
     public class DestroyableBall : MonoBehaviour
     {
-        private const float MovementDuration = 2.5f;
+        private const float MovementDuration = 1.5f;
 
         [SerializeField] private Rigidbody _rigidbody;
         [SerializeField] private SphereCollider _collider;
